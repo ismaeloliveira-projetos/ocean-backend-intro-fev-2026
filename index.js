@@ -57,6 +57,22 @@ app.post('/personagens', (req, res) => {
   })
 })
 
+app.put('/personagens/:id', (req, res) => {
+  const id = req.params.id
+  const nomeAtualizado = req.body.nome
+  
+  if (!lista[id - 1]) {
+    return res.status(404).json({ erro: 'Personagem não encontrado' })
+  }
+
+  lista[id - 1] = nomeAtualizado
+
+  res.json({
+    mensagem: 'Personagem atualizado com sucesso',
+    personagem: nomeAtualizado
+  })
+})
+
 app.listen(3000, () => {
   console.log('Server is running on http://localhost:3000')
 })
