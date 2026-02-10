@@ -23,6 +23,31 @@ const lista = [
   { id: 5, nome: 'Jerry Smith', imagem: 'https://rickandmortyapi.com/api/character/avatar/5.jpeg' }
 ]
 
+function isValidUrl(str) {
+  try {
+    new URL(str)
+    return true
+  } catch (err) {
+    return false
+  }
+}
+
+function validatePersonagemData(data) {
+  const { nome, imagem } = data || {}
+
+  if (!nome || typeof nome !== 'string' || !nome.trim()) {
+    return { valid: false, error: 'Nome é obrigatório' }
+  }
+
+  if (imagem !== undefined && imagem !== null && imagem !== '') {
+    if (typeof imagem !== 'string' || !isValidUrl(imagem)) {
+      return { valid: false, error: 'Imagem deve ser uma URL válida' }
+    }
+  }
+
+  return { valid: true }
+}
+
 
 app.get('/lista', (req, res) => {
   res.json(lista)
@@ -32,7 +57,11 @@ app.get('/lista', (req, res) => {
 app.get('/personagens/:id', (req, res) => {
   const id = Number(req.params.id)
 
-  const personagem = lista[id - 1]
+  if (!Number.isInteger(id) || id <= 0) {
+    return res.status(400).json({ erro: 'ID inválido' })
+  }
+
+  const personagem = lista.find(p => p.id === id)
 
   if (!personagem) {
     return res.status(404).json({ erro: 'Personagem não encontrado' })
@@ -43,40 +72,63 @@ app.get('/personagens/:id', (req, res) => {
 
 
 app.post('/personagens', (req, res) => {
-  const { nome } = req.body
+  const { nome, imagem } = req.body
 
-  if (!nome) {
-    return res.status(400).json({ erro: 'Nome é obrigatório' })
+  const validation = validatePersonagemData({ nome, imagem })
+  if (!validation.valid) {
+    return res.status(400).json({ erro: validation.error })
   }
 
-  lista.push(nome)
+  const newId = lista.length ? Math.max(...lista.map(p => p.id)) + 1 : 1
+  const personagem = { id: newId, nome: nome.trim(), imagem: imagem || '' }
+
+  lista.push(personagem)
 
   res.status(201).json({
     mensagem: 'Personagem criado com sucesso',
-    personagem: nome
+    personagem
   })
 })
 
 app.put('/personagens/:id', (req, res) => {
-  const id = req.params.id
-  const nomeAtualizado = req.body.nome
-  
-  if (!lista[id - 1]) {
+  const id = Number(req.params.id)
+  const { nome, imagem } = req.body
+
+  if (!Number.isInteger(id) || id <= 0) {
+    return res.status(400).json({ erro: 'ID inválido' })
+  }
+
+  const index = lista.findIndex(p => p.id === id)
+  if (index === -1) {
     return res.status(404).json({ erro: 'Personagem não encontrado' })
   }
 
-  lista[id - 1] = nomeAtualizado
+  const validation = validatePersonagemData({ nome, imagem })
+  if (!validation.valid) {
+    return res.status(400).json({ erro: validation.error })
+  }
+
+  lista[index] = { ...lista[index], nome: nome.trim(), imagem: imagem || '' }
 
   res.json({
     mensagem: 'Personagem atualizado com sucesso',
-    personagem: nomeAtualizado
+    personagem: lista[index]
   })
 })
 
 app.delete('/personagens/:id', (req, res) => {
-  const id = req.params.id
+  const id = Number(req.params.id)
 
-  lista.splice(id - 1, 1)
+  if (!Number.isInteger(id) || id <= 0) {
+    return res.status(400).json({ erro: 'ID inválido' })
+  }
+
+  const index = lista.findIndex(p => p.id === id)
+  if (index === -1) {
+    return res.status(404).json({ erro: 'Personagem não encontrado' })
+  }
+
+  lista.splice(index, 1)
 
   res.json({ mensagem: 'Personagem deletado com sucesso' })
 } )

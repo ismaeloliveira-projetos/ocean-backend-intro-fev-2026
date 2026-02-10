@@ -2,6 +2,6 @@ PUT http://localhost:3000/personagens/1
 Content-Type: application/json
 
 {
-  "nome": "Rick Sanchez"
+  "nome": ""
  
 }
