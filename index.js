@@ -2,6 +2,10 @@ import express from 'express'
 
 const app = express()
 
+
+app.use(express.json())
+
+
 app.get('/', (req, res) => {
   res.send('Hello World')
 })
@@ -9,6 +13,7 @@ app.get('/', (req, res) => {
 app.get('/oi', (req, res) => {
   res.send('olá, mundoo!!')
 })
+
 
 const lista = [
   'Rick Sanchez',
@@ -18,15 +23,38 @@ const lista = [
   'Jerry Smith'
 ]
 
+
 app.get('/lista', (req, res) => {
-  res.send(personagens)
+  res.json(lista)
 })
+
+
 app.get('/personagens/:id', (req, res) => {
-  const id= req.params.id
+  const id = Number(req.params.id)
 
   const personagem = lista[id - 1]
 
-  res.send(personagem)
+  if (!personagem) {
+    return res.status(404).json({ erro: 'Personagem não encontrado' })
+  }
+
+  res.json(personagem)
+})
+
+
+app.post('/personagens', (req, res) => {
+  const { nome } = req.body
+
+  if (!nome) {
+    return res.status(400).json({ erro: 'Nome é obrigatório' })
+  }
+
+  lista.push(nome)
+
+  res.status(201).json({
+    mensagem: 'Personagem criado com sucesso',
+    personagem: nome
+  })
 })
 
 app.listen(3000, () => {
