@@ -16,11 +16,11 @@ app.get('/oi', (req, res) => {
 
 
 const lista = [
-  'Rick Sanchez',
-  'Morty Smith',
-  'Summer Smith',
-  'Beth Smith',
-  'Jerry Smith'
+  { id: 1, nome: 'Rick Sanchez', imagem: 'https://rickandmortyapi.com/api/character/avatar/1.jpeg' },
+  { id: 2, nome: 'Morty Smith', imagem: 'https://rickandmortyapi.com/api/character/avatar/2.jpeg' },
+  { id: 3, nome: 'Summer Smith', imagem: 'https://rickandmortyapi.com/api/character/avatar/3.jpeg' },
+  { id: 4, nome: 'Beth Smith', imagem: 'https://rickandmortyapi.com/api/character/avatar/4.jpeg' },
+  { id: 5, nome: 'Jerry Smith', imagem: 'https://rickandmortyapi.com/api/character/avatar/5.jpeg' }
 ]
 
 
